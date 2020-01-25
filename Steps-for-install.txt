@@ -1,3 +1,73 @@
 sudo apt update
 sudo apt upgrade -y
+sudo apt install git -y
+#Install SSH
 sudo apt install openssh-server -y
+sudo ufw allow ssh
+sudo ufw enable
+#Install Jenkins
+sudo apt install openjdk-8-jdk -y
+wget -q -O - https://pkg.jenkins.io/debian/jenkins.io.key | sudo apt-key add -
+sudo sh -c 'echo deb http://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'
+sudo apt update
+sudo apt install jenkins -y
+sudo ufw allow 8080
+#Install nginx
+sudo apt install nginx -y
+sudo ufw allow 'Nginx HTTP'
+#Set up Jenkins in NGINX
+sudo mkdir -p /var/www/ci.futurepr0n.com/html
+sudo chown -R $USER:$USER /var/www/ci.futurepr0n.com/html
+sudo chmod -R 755 /var/www/ci.futurepr0n.com
+---- CREATE A WEBPAGE ---
+nano /var/www/example.com/html/index.html
+<html>
+    <head>
+        <title>Welcome to Example.com!</title>
+    </head>
+    <body>
+        <h1>Success!  The example.com server block is working!</h1>
+    </body>
+</html>
+----------------------------
+sudo nano /etc/nginx/sites-available/ci.futurepr0n.com
+------- Create File
+server {
+        listen 80;
+        listen [::]:80;
+
+        root /var/www/ci.futurepr0n.com/html;
+        index index.html index.htm index.nginx-debian.html;
+
+        server_name ci.futurepr0n.com www.ci.futurepr0n.com;
+
+        access_log      /var/log/nginx/jenkins.access.log;
+        error_log       /var/log/nginx/jenkins.error.log;
+
+        location / {
+                #try_files $uri $uri/ =404;
+                include /etx/nginx/proxy_params;
+                proxy_pass              http://127.0.0.1:8080
+                proxy_read_timeout      90s;
+                proxy_redirect          http://127.0.0.1 https://ci.futurepr0n.com;
+        }
+}
+
+----------------------------
+sudo ln -s /etc/nginx/sites-available/ci.futurepr0n.com /etc/nginx/sites-enabled/
+
+sudo nano /etc/nginx/nginx.conf
+Change section to edit (Uncomment) 
+
+...
+http {
+    ...
+    server_names_hash_bucket_size 64;
+    ...
+}
+...
+
+
+sudo systemctl restart nginx
+
+#install Nexus
