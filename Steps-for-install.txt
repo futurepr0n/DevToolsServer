@@ -71,3 +71,5 @@ http {
 sudo systemctl restart nginx
 
 #install Nexus
+cd ~/Downloads or go to /opt directly as sudo?
+wget -d https://download.sonatype.com/nexus/3/latest-unix.tar.gz
