@@ -73,3 +73,6 @@ sudo systemctl restart nginx
 #install Nexus
 cd ~/Downloads or go to /opt directly as sudo?
 wget -d https://download.sonatype.com/nexus/3/latest-unix.tar.gz
+
+## Install Docker
+sudo apt-get install apt-transport-https ca-certificates curl gnupg-agent software-properties-common -y
